@@ -14,9 +14,8 @@ provider "aws" {
 }
 
 
-//TODO(nacho): usar modulo de s3
 resource "aws_s3_bucket" "state" {
-  bucket_prefix = "state-faus"
+  bucket_prefix = "state"
 }
 
 resource "aws_s3_bucket_public_access_block" "state" {
