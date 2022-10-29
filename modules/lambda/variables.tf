@@ -33,6 +33,16 @@ variable "subnet_ids" {
   type        = list(any)
 }
 
+variable "role" {
+  description = "IAM Role"
+  type        = string
+}
+
+variable "security_groups" {
+  description = "Security Groups"
+  type        = list(string)
+}
+
 variable "base_domain" {
   description = "Application base domain"
   type        = string

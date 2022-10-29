@@ -21,6 +21,10 @@ resource "aws_api_gateway_deployment" "this" {
     redeployment = sha1(jsonencode(var.lambda_hashes))
   }
 
+  depends_on = [
+    
+  ]
+
   lifecycle {
     create_before_destroy = true
   }

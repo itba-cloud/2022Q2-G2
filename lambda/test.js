@@ -1,3 +1,8 @@
 exports.handler = async (event) => {
-    return "Hello from lambda!";
+    return {
+        "isBase64Encoded": false,
+        "statusCode": 200,
+        "headers": { },
+        "body": JSON.stringify({ Hola: "cloud" })
+    }
 };

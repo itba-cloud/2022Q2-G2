@@ -1,59 +1,8 @@
-resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_role_for_lambda"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_policy" "vpc_attaching" {
-  name        = "policy_vpc_attaching"
-  path        = "/"
-  description = "IAM policy for vpc_attaching a lambda"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:CreateNetworkInterface",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeInstances",
-        "ec2:AttachNetworkInterface"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
-}
-//TODO(nacho): esto hay que separarlo, la generacion de policy aca se rompe.
-// podria ser otro modulo.
-resource "aws_iam_role_policy_attachment" "vpc_attaching" {
-  role       = aws_iam_role.iam_for_lambda.name
-  policy_arn = aws_iam_policy.vpc_attaching.arn
-}
-
 resource "aws_lambda_function" "this" {
   filename = var.filename
 
   function_name    = var.function_name
-  role             = aws_iam_role.iam_for_lambda.arn
+  role             = var.role
   handler          = var.handler
   source_code_hash = filebase64sha256(var.filename)
 
@@ -61,7 +10,7 @@ resource "aws_lambda_function" "this" {
 
   vpc_config {
     subnet_ids         = var.subnet_ids
-    security_group_ids = [aws_security_group.lambda.id]
+    security_group_ids = var.security_groups
   }
 
   tags = var.tags
@@ -98,7 +47,7 @@ resource "aws_api_gateway_integration" "lambda_response" {
   resource_id             = aws_api_gateway_resource.this.id
   http_method             = aws_api_gateway_method.this.http_method
   integration_http_method = "POST" //Lambdas solo pueden ser accedidas por POST
-  type                    = "AWS"
+  type                    = "AWS_PROXY"
   uri                     = aws_lambda_function.this.invoke_arn
 }
 

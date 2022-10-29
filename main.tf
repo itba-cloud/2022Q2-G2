@@ -76,35 +76,114 @@ module "api_gateway" {
   aws_region = var.aws_region
 
 
-  lambda_hashes = [module.lambda_busquedas.lambda_rest_configuration_hash]
+  lambda_hashes = [module.lambda.lambda_rest_configuration_hash, module.lambda_busquedas.lambda_rest_configuration_hash]
 
 }
 
-# module "lambda" {
-#   source = "./modules/lambda"
+resource "aws_iam_role" "lambda" {
+  name = "iam_role_for_lambda"
 
-#   function_name       = "test"
-#   filename            = "./lambda/test.zip"
-#   handler             = "test.handler"
-#   runtime             = "nodejs12.x"
+  assume_role_policy = jsonencode(
+    {
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Action" : "sts:AssumeRole",
+          "Principal" : {
+            "Service" : "lambda.amazonaws.com"
+          },
+          "Effect" : "Allow",
+          "Sid" : ""
+        }
+      ]
+  })
 
-#   base_domain         = var.base_domain
-#   aws_account_id      = local.aws_account_id 
-#   aws_region          = var.aws_region 
+  inline_policy {
+    name = "policy_vpc_attaching"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Effect" : "Allow",
+          "Action" : [
+            "ec2:DescribeNetworkInterfaces",
+            "ec2:CreateNetworkInterface",
+            "ec2:DeleteNetworkInterface",
+            "ec2:DescribeInstances",
+            "ec2:AttachNetworkInterface"
+          ],
+          "Resource" : "*"
+        }
+      ]
+    })
+  }
 
-#   gateway_id          = module.api_gateway.id
-#   gateway_resource_id = module.api_gateway.resource_id
+}
 
-#   path_part           = "test"
-#   http_method         = "GET"
-#   status_code         = "200"
+resource "aws_security_group" "lambda" {
+  name   = "lambda_sg"
+  vpc_id = module.vpc.vpc_id
+  tags = {
+    Name = "lambda_sg"
+  }
+}
 
-#   subnet_ids          = module.vpc.private_subnets_ids
-#   vpc_id              = module.vpc.vpc_id
-#   tags = {
-#     Name = "Test Lambda"
-#   }
-# }
+resource "aws_security_group_rule" "out" {
+  type              = "egress"
+  from_port         = 0
+  to_port           = 0
+  protocol          = "-1"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.lambda.id
+}
+
+resource "aws_security_group_rule" "http_in" {
+  type              = "ingress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.lambda.id
+}
+
+resource "aws_security_group_rule" "https_in" {
+  type              = "ingress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.lambda.id
+}
+
+
+
+module "lambda" {
+  source = "./modules/lambda"
+
+  function_name       = "test"
+  filename            = "./lambda/test.zip"
+  handler             = "test.handler"
+  runtime             = "nodejs12.x"
+
+  base_domain         = var.base_domain
+  aws_account_id      = local.aws_account_id 
+  aws_region          = var.aws_region 
+
+  gateway_id          = module.api_gateway.id
+  gateway_resource_id = module.api_gateway.resource_id
+
+  path_part           = "test"
+  http_method         = "GET"
+  status_code         = "200"
+
+  subnet_ids          = module.vpc.private_subnets_ids
+  vpc_id              = module.vpc.vpc_id
+  role                = aws_iam_role.lambda.arn
+  security_groups     = [aws_security_group.lambda.id]
+  tags = {
+    Name = "Test Lambda"
+  }
+}
 
 module "lambda_busquedas" {
   source = "./modules/lambda"
@@ -125,8 +204,10 @@ module "lambda_busquedas" {
   http_method = "GET"
   status_code = "200"
 
-  subnet_ids = module.vpc.private_subnets_ids
-  vpc_id     = module.vpc.vpc_id
+  subnet_ids        = module.vpc.private_subnets_ids
+  vpc_id            = module.vpc.vpc_id
+  role              = aws_iam_role.lambda.arn
+  security_groups   = [aws_security_group.lambda.id]
   tags = {
     Name = "ListarBusquedas Lambda"
   }
