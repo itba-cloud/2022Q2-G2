@@ -2,6 +2,33 @@
 
 Trabajo practico 3 para la materia Cloud Computing 2022
 
+## Uso
+
+### Deployar Backend
+
+El backend es el sistema que tenemos para almacenar el state de terraform generado. En este caso utilizaremos un S3 encriptado con una llave en KMS. Es por esto que antes de deployar nuestro proyecto tendremos que crear estos recursos.
+
+1. En el archivo `backend/config.tfvars` deberemos configurar los siguientes parametros:
+    - `authorized_IAM_arn`: Lista con el arn de los usuarios IAM de AWS con los queremos poder ejecutar terraform. Por ejemplo, el que creamos previamente.
+    - `root_IAM_arn`: El arn de nuestro usuario root IAM en AWS.
+    - `aws_region`: La region AWS donde queremos almacenar el state.
+
+    Se incluye un archivo de ejemplo para modificar.
+
+2. Ejecutar `init_backend.sh`. Se deberia crear el archivo de configuracion de backend `backend_config.tfvars`.
+
+### 6. Deployar Aplicacion
+
+1. En el archivo `config.tfvars` deberemos configurar los siguientes parametros:
+    - `aws_region`: Region de AWS en donde deployar.
+    - `base_domain`: Dominio o subdominio de la aplicacion para la cual creamos la `HostedZone` en `Route53`.
+
+  Se incluye un archivo de ejemplo para modificar.
+
+2. Ejecutar `terraform init -backend-config=backend_config.tfvars` para inicializar terraform.
+3. Ejecutar `terraform apply -var-file=config.tfvars -auto-approve` para empezar a deployar.
+
+
 ## Módulos
 
 Para la generación de la infraestructura utilizando terraform se estructuró la configuración utilizando múltiples módulos donde se agrupan configuraciones relacionadas de forma tal de simplificar el manejo y de evitar la repetición. Estos módulos son combinados en un main principal el cual es configurable vía variables.
