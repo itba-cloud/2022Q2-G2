@@ -35,11 +35,11 @@ module "site_bucket" {
   source = "terraform-aws-modules/s3-bucket/aws"
 
   force_destroy = true
-  bucket = local.bucket_name
+  bucket        = local.bucket_name
 
   # Bucket policies
-  attach_policy                         = true
-  policy                                = data.aws_iam_policy_document.site.json
+  attach_policy = true
+  policy        = data.aws_iam_policy_document.site.json
   # attach_deny_insecure_transport_policy = true
   # attach_require_latest_tls_policy      = true
 
@@ -66,11 +66,11 @@ module "site_bucket" {
     error_document = "error.html"
   }
 
-  
+
   server_side_encryption_configuration = {
     rule = {
       apply_server_side_encryption_by_default = {
-        sse_algorithm     = "AES256"
+        sse_algorithm = "AES256"
       }
     }
   }

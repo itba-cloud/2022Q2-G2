@@ -20,12 +20,12 @@ data "aws_route53_zone" "main" {
 
 resource "aws_route53_record" "main" {
   zone_id = data.aws_route53_zone.main.zone_id
-  name    = "${var.app_domain}"
+  name    = var.app_domain
   type    = "A"
 
   alias {
-    name    = var.cdn.domain_name
-    zone_id = var.cdn.hosted_zone_id
+    name                   = var.cdn.domain_name
+    zone_id                = var.cdn.hosted_zone_id
     evaluate_target_health = false
   }
 }

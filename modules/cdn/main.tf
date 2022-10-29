@@ -1,9 +1,9 @@
 data "aws_cloudfront_cache_policy" "disabled" {
-    name = "Managed-CachingDisabled"
+  name = "Managed-CachingDisabled"
 }
 
 data "aws_cloudfront_cache_policy" "optimized" {
-    name = "Managed-CachingOptimized"
+  name = "Managed-CachingOptimized"
 }
 
 resource "aws_cloudfront_distribution" "main" {
@@ -16,16 +16,16 @@ resource "aws_cloudfront_distribution" "main" {
       origin_access_identity = var.OAI.cloudfront_access_identity_path
     }
   }
-  
+
   origin {
     domain_name = var.api_domain_name
     origin_id   = var.api_origin_id
 
     custom_origin_config {
-        origin_protocol_policy = "https-only"
-        origin_ssl_protocols = ["TLSv1.2"]
-        https_port = 443
-        http_port = 80
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1.2"]
+      https_port             = 443
+      http_port              = 80
     }
   }
 
@@ -37,10 +37,10 @@ resource "aws_cloudfront_distribution" "main" {
 
 
   default_cache_behavior {
-    allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
-    cached_methods   = ["GET", "HEAD"]
-    target_origin_id = var.s3_origin_id
-    cache_policy_id  = data.aws_cloudfront_cache_policy.optimized.id
+    allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+    cached_methods         = ["GET", "HEAD"]
+    target_origin_id       = var.s3_origin_id
+    cache_policy_id        = data.aws_cloudfront_cache_policy.optimized.id
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
   }
@@ -73,8 +73,8 @@ resource "aws_cloudfront_distribution" "main" {
   viewer_certificate {
     cloudfront_default_certificate = length(var.aliases) == 0
 
-    acm_certificate_arn       = var.certificate_arn
-    minimum_protocol_version  = length(var.aliases) > 0 ? "TLSv1.2_2021" : null
-    ssl_support_method        = length(var.aliases) > 0 ? "sni-only" : null
+    acm_certificate_arn      = var.certificate_arn
+    minimum_protocol_version = length(var.aliases) > 0 ? "TLSv1.2_2021" : null
+    ssl_support_method       = length(var.aliases) > 0 ? "sni-only" : null
   }
 }

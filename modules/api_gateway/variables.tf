@@ -5,5 +5,5 @@ variable "aws_region" {
 
 variable "lambda_hashes" {
   description = "List of lambda rest configuration hash codes"
-  type        = list(string)   
+  type        = list(string)
 }

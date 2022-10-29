@@ -5,26 +5,26 @@ variable "OAI" {
 }
 
 variable "s3_origin_id" {
-  type        = string
+  type = string
 }
 
 variable "api_origin_id" {
-  type        = string
+  type = string
 }
 
 variable "api_domain_name" {
-  type        = string
+  type = string
 }
 
 variable "bucket_domain_name" {
-  type        = string
+  type = string
 }
 
 variable "aliases" {
-  type        = set(string)
+  type = set(string)
 }
 
 variable "certificate_arn" {
-  type        = string
+  type = string
   # default     = null
 }
