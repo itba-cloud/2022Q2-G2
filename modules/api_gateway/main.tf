@@ -22,7 +22,7 @@ resource "aws_api_gateway_deployment" "this" {
   }
 
   depends_on = [
-    
+
   ]
 
   lifecycle {

@@ -160,26 +160,26 @@ resource "aws_security_group_rule" "https_in" {
 module "lambda" {
   source = "./modules/lambda"
 
-  function_name       = "test"
-  filename            = "./lambda/test.zip"
-  handler             = "test.handler"
-  runtime             = "nodejs12.x"
+  function_name = "test"
+  filename      = "./lambda/test.zip"
+  handler       = "test.handler"
+  runtime       = "nodejs12.x"
 
-  base_domain         = var.base_domain
-  aws_account_id      = local.aws_account_id 
-  aws_region          = var.aws_region 
+  base_domain    = var.base_domain
+  aws_account_id = local.aws_account_id
+  aws_region     = var.aws_region
 
   gateway_id          = module.api_gateway.id
   gateway_resource_id = module.api_gateway.resource_id
 
-  path_part           = "test"
-  http_method         = "GET"
-  status_code         = "200"
+  path_part   = "test"
+  http_method = "GET"
+  status_code = "200"
 
-  subnet_ids          = module.vpc.private_subnets_ids
-  vpc_id              = module.vpc.vpc_id
-  role                = aws_iam_role.lambda.arn
-  security_groups     = [aws_security_group.lambda.id]
+  subnet_ids      = module.vpc.private_subnets_ids
+  vpc_id          = module.vpc.vpc_id
+  role            = aws_iam_role.lambda.arn
+  security_groups = [aws_security_group.lambda.id]
   tags = {
     Name = "Test Lambda"
   }
@@ -204,10 +204,10 @@ module "lambda_busquedas" {
   http_method = "GET"
   status_code = "200"
 
-  subnet_ids        = module.vpc.private_subnets_ids
-  vpc_id            = module.vpc.vpc_id
-  role              = aws_iam_role.lambda.arn
-  security_groups   = [aws_security_group.lambda.id]
+  subnet_ids      = module.vpc.private_subnets_ids
+  vpc_id          = module.vpc.vpc_id
+  role            = aws_iam_role.lambda.arn
+  security_groups = [aws_security_group.lambda.id]
   tags = {
     Name = "ListarBusquedas Lambda"
   }
