@@ -59,6 +59,8 @@ Se construye el módulo subnet que permite definir la VPC en la cual se trabajar
 Esta función hará dependiente los cidr a utilizar de las subnets, de la cantidad de subnets recibidas a la hora de generar el módulo. Las variables expuestas en el output serán el id, el cidr de la vpc y todas los ids de las private subnets, recorriendo las con un for.
 Por último, en este módulo se define también el internet gateway.
 
+
+
 ### Módulo Lambda
     
 Se definió una arquitectura serverless donde la lógica será implementada mediante funciones lambda. El módulo lambda será de vital importancia para definir las diferentes implementaciones a usar en el trabajo. Debido a que este módulo será altamente configurable, el mismo recibirá una gran cantidad de variables. Estas cuentan con sus descripciones en el archivo variables.tf. Cabe destacar que se reciben tanto variables necesarias para la definición de la función, como otras que se utilizarán una vez ésta ya haya sido definida. Entre estas, por ejemplo, las necesarias para definir una entrada REST para el API gateway. Se definió de esta manera para evitar complejizar de dicho módulo con cosas propias de la función. Para la generación de las lambdas se define la policy correspondiente, la cual deberá permitir la creación de las mismas dentro de una VPC. A su vez, se define un security group para las lambdas en main.tf que será utilizado por todas ellas. Se decidió realizarlo de esta manera debido a la simplicidad del problema puntual, pero en una situación más real se podría implementar una solución más complejas.
